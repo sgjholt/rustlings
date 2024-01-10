@@ -20,8 +20,6 @@
 //
 // No hints this time!
 
-// I AM NOT DONE
-
 pub enum Command {
     Uppercase,
     Trim,
@@ -29,23 +27,33 @@ pub enum Command {
 }
 
 mod my_module {
+    use std::ascii::AsciiExt;
+
     use super::Command;
 
-    // TODO: Complete the function signature!
-    pub fn transformer(input: ???) -> ??? {
-        // TODO: Complete the output declaration!
-        let mut output: ??? = vec![];
+    // Takes Vec of tuples of (String, Command) outputs Vec of Strings
+    pub fn transformer(input: Vec<(String, Command)>) -> Vec<String> {
+        // Define a mutable vec object to insert strings into
+        let mut output: Vec<String> = vec![];
+        // Loop through Vec, and unpack tuples into variable refs
         for (string, command) in input.iter() {
-            // TODO: Complete the function body. You can do it!
+            // Match the command, perform corresponding operation, and return to s
+            let s: String = match command {
+                Command::Uppercase => string.to_uppercase(), // to_uppercase() converts to String from &str
+                Command::Trim => string.trim().to_string(),
+                Command::Append(n) => string.to_string() + &"bar".repeat(*n),
+            };
+            // Push s: String to output: Vec<String>
+            output.push(s)
         }
+        // Return output Vec<String>
         output
     }
 }
 
 #[cfg(test)]
 mod tests {
-    // TODO: What do we need to import to have `transformer` in scope?
-    use ???;
+    use super::my_module::transformer;
     use super::Command;
 
     #[test]
