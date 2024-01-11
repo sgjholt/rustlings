@@ -5,6 +5,12 @@
 
 // I AM NOT DONE
 
+use std::vec;
+
+fn uint_multiply(a: u64, b: u64) -> u64 {
+    a * b
+}
+
 pub fn factorial(num: u64) -> u64 {
     // Complete this function to return the factorial of num
     // Do not use:
@@ -15,8 +21,17 @@ pub fn factorial(num: u64) -> u64 {
     // For an extra challenge, don't use:
     // - recursion
     // Execute `rustlings hint iterators4` for hints.
-}
 
+    // Method 1: using iter.fold
+    // (1..num + 1).fold(1, |a, b| a * b)
+
+    // Method 2: using iter.reduce
+    // You have to account for the case where num is 0.
+    match num {
+        0 => 1,
+        _ => (1..num + 1).reduce(|a, b| a * b).unwrap(),
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
