@@ -10,11 +10,11 @@
 // Execute `rustlings hint using_as` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
 fn average(values: &[f64]) -> f64 {
     let total = values.iter().sum::<f64>();
-    total / values.len()
+    // .len() returns an unsigned integer (e.g., u32) so you only need to convert
+    // ... the .len() output to a 64-bit float to match total, 'as' can do this.
+    total / values.len() as f64
 }
 
 fn main() {
