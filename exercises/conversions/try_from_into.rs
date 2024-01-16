@@ -9,7 +9,10 @@
 // Execute `rustlings hint try_from_into` or use the `hint` watch subcommand for
 // a hint.
 
-use std::convert::{TryFrom, TryInto};
+use std::{
+    convert::{TryFrom, TryInto},
+    num::ParseIntError,
+};
 
 #[derive(Debug, PartialEq)]
 struct Color {
@@ -27,8 +30,6 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
-
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
 // integers, an array of three integers, and a slice of integers.
@@ -37,10 +38,39 @@ enum IntoColorError {
 // time, but the slice implementation needs to check the slice length! Also note
 // that correct RGB color values must be integers in the 0..=255 range.
 
+fn check_valid_rgb_value(rgb: &Vec<i16>) -> bool {
+    /// Checks each element of the array to ensure it maps between 0 to 255. The
+    ///  function returns true if each element is between 0 to 255, otherwise false.
+    ///
+    let mut check = vec![true, true, true];
+    for (i, item) in rgb.into_iter().enumerate() {
+        if (item < &0) || (item > &255) {
+            check[i] = false;
+        }
+    }
+    check.into_iter().all(|x| x == true)
+}
+
 // Tuple implementation
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        let (r, g, b) = tuple;
+        let rgb = vec![r, g, b];
+
+        if rgb.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+
+        if !check_valid_rgb_value(&rgb) {
+            return Err(IntoColorError::IntConversion);
+        }
+
+        Ok(Color {
+            red: r as u8,
+            green: g as u8,
+            blue: b as u8,
+        })
     }
 }
 
@@ -48,6 +78,22 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        let rgb = arr.to_vec();
+        if rgb.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+
+        if !check_valid_rgb_value(&rgb) {
+            return Err(IntoColorError::IntConversion);
+        }
+
+        let (r, g, b) = (rgb[0], rgb[1], rgb[2]);
+
+        Ok(Color {
+            red: r as u8,
+            green: g as u8,
+            blue: b as u8,
+        })
     }
 }
 
@@ -55,6 +101,23 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        let rgb = slice.to_vec();
+
+        if rgb.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+
+        if !check_valid_rgb_value(&rgb) {
+            return Err(IntoColorError::IntConversion);
+        }
+
+        let (r, g, b) = (rgb[0], rgb[1], rgb[2]);
+
+        Ok(Color {
+            red: r as u8,
+            green: g as u8,
+            blue: b as u8,
+        })
     }
 }
 

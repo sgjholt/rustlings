@@ -31,8 +31,6 @@ enum ParsePersonError {
     ParseInt(ParseIntError),
 }
 
-// I AM NOT DONE
-
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
 // 2. Split the given string on the commas present in it
@@ -52,21 +50,30 @@ enum ParsePersonError {
 impl FromStr for Person {
     type Err = ParsePersonError;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        // Check if the string is empty
         if s.is_empty() {
+            // return error for empty string
             return Err(ParsePersonError::Empty);
+        // Check if there are more than two elements after splitting on ','
+        } else if s.split(",").collect::<Vec<&str>>().len() > 2 {
+            return Err(ParsePersonError::BadLen); // return error for incorrect length
+        } else {
+            // Otherwise, the string is not empty, and doesn't have more than 2 elements after splitting on ','
+            // Extract the elements by splitting once - expect two elements. If < 2 elements, return an error.
+            let (name, age) = s.split_once(',').ok_or(ParsePersonError::BadLen)?;
+            // Attempt to convert the second element to an unsigned integer. Return error if failed.
+            let age = age.parse::<usize>().map_err(ParsePersonError::ParseInt)?;
+            // Check to see if the first extracted element is empty. If so, no name was given.
+            if name.is_empty() {
+                return Err(ParsePersonError::NoName);
+            }
+            // If we get to here without failing, then s looked like this: "Name, 30"
+            // ... so we can return a Person without failing.
+            Ok(Person {
+                name: name.into(),
+                age,
+            })
         }
-
-        let (name, age) = s.split_once(',').ok_or(ParsePersonError::BadLen)?;
-        let age = age.parse().map_err(ParsePersonError::ParseInt)?;
-
-        if name.is_empty() {
-            return Err(ParsePersonError::NoName);
-        }
-
-        Ok(Person {
-            name: name.into(),
-            age,
-        })
     }
 }
 
